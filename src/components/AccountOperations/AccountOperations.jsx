@@ -1,19 +1,50 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import {
+  deposit,
+  requestLoan,
+  withdrawal,
+  payLoan,
+} from "../../redux/accountSlice";
+import { useSelector } from "react-redux";
 
-function AccountOperations() {
+const AccountOperations = () => {
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawalAmount, setWithdrawalAmount] = useState("");
   const [loanAmount, setLoanAmount] = useState("");
   const [loanPurpose, setLoanPurpose] = useState("");
   const [currency, setCurrency] = useState("USD");
 
-  function handleDeposit() {}
+  const dispatch = useDispatch();
+  const {
+    loan: currentLoan,
+    loanPurpose: currentLoanPurpose,
+    balance,
+  } = useSelector((store) => store.account);
+  console.log(balance);
 
-  function handleWithdrawal() {}
+  const handleDeposit = () => {
+    if (!depositAmount) return;
+    dispatch(deposit(depositAmount));
+    setDepositAmount("");
+  };
 
-  function handleRequestLoan() {}
+  const handleWithdrawal = () => {
+    if (!withdrawalAmount) return;
+    dispatch(withdrawal(withdrawalAmount));
+    setWithdrawalAmount("");
+  };
 
-  function handlePayLoan() {}
+  const handleRequestLoan = () => {
+    if (!loanAmount || !loanPurpose) return;
+    dispatch(requestLoan(loanAmount, loanPurpose));
+    setLoanAmount("");
+    setLoanPurpose("");
+  };
+
+  const handlePayLoan = () => {
+    dispatch(payLoan());
+  };
 
   return (
     <div>
@@ -66,13 +97,17 @@ function AccountOperations() {
           <button onClick={handleRequestLoan}>Request loan</button>
         </div>
 
-        <div>
-          <span>Pay back $X</span>
-          <button onClick={handlePayLoan}>Pay loan</button>
-        </div>
+        {currentLoan > 0 && (
+          <div>
+            <span>
+              Pay back {currentLoan} ({currentLoanPurpose})
+            </span>
+            <button onClick={handlePayLoan}>Pay loan</button>
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default AccountOperations;
